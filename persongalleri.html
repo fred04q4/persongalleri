@@ -5,8 +5,83 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>persongalleri</title>
+
+    <style>
+img {
+
+width: 100%;
+
+}
+
+section {
+
+display: grid;
+
+grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+
+grid-gap: 5px;
+
+}
+
+article {
+
+border: 1px solid black;
+
+margin: 2%;
+
+padding: 2%;
+
+}
+    </style>
 </head>
 <body>
-    
+    <h1>Persongalleri</h1>
+    <section> </section>
+<template>
+    <article>
+    <img src="" alt="" class="billede">
+    <h2 class="navn"></h2>
+    <p class="titel"></p>
+    <p class="føselsdag"></p>
+    </article>
+</template>
+
+    <script>
+        const section = document.querySelector("section")
+        const temp = document.querySelector("template")
+        let personer; 
+        
+    const url ="https://persongalleri-5d3e.restdb.io/rest/persongalleri";
+
+    const options = {
+        headers: {
+            'x-apikey':"600fe9211346a1524ff12e31"
+        }
+    };
+    async function hentdata() {
+            const respons = await fetch(url,options);
+             personer = await respons.json();
+            vis();
+        }
+        
+        hentdata()
+
+    function vis(){
+    console.log(personer)
+
+    personer.forEach(person => {
+                const klon = temp.cloneNode(true).content;
+                klon.querySelector("h2").textContent = person.fornavn + person.efternavn;
+                klon.querySelector(".titel").textContent = "titel: " + person.titel;
+                klon.querySelector(".føselsdag").textContent = "føselsdag: " + person.føselsdag;
+                klon.querySelector(".billede").src ="faces/"+person.billede;
+              
+                section.appendChild(klon);
+            })
+}   
+
+
+
+    </script>
 </body>
 </html>
