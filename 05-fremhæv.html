@@ -30,12 +30,34 @@ border: 1px solid black;
 margin: 2%;
 
 padding: 2%;
+}
+
+nav {
+
+display: flex;
+
+justify-content: center;
+
+gap: 10px;
 
 }
+
+.valgt {
+
+background-color: brown;
+
+}
+
     </style>
 </head>
 <body>
-    <h1>Persongalleri</h1>
+    <h1>Alle</h1>
+    <nav>
+        <button data-troende="alle" class="valgt">Alle</button>
+        <button data-troende="ja">Troende</button>
+        <button data-troende="nej">Ikke Troende</button>
+        <button data-troende="tvivler">Tvivler</button>
+    </nav>
     <section> </section>
 <template>
     <article>
@@ -48,8 +70,10 @@ padding: 2%;
 
     <script>
         const section = document.querySelector("section")
-        const temp = document.querySelector("template")
+        const temp = document.querySelector("template").content;
+        const header = document.querySelector("h1") 
         let personer; 
+        let filter = "alle";
         
     const url ="https://persongalleri-5d3e.restdb.io/rest/persongalleri";
 
@@ -58,27 +82,56 @@ padding: 2%;
             'x-apikey':"600fe9211346a1524ff12e31"
         }
     };
+
+    document.addEventListener("DOMContentLoaded", start);
+
+    function start() {
+
+    const filterKnapper = document.querySelectorAll("nav button");
+
+    filterKnapper.forEach((knap) =>
+
+    knap.addEventListener("click", filtrerPersoner)
+
+    );
+
+    hentdata();
+
+    }
+
+    function filtrerPersoner() {
+
+    filter = this.dataset.troende;
+    document.querySelector(".valgt").classList.remove("valgt");
+    this.classList.add("valgt")
+    vis();
+    header.textContent = this.textContent;
+    }
+
     async function hentdata() {
             const respons = await fetch(url,options);
              personer = await respons.json();
             vis();
         }
         
-        hentdata()
+
 
     function vis(){
     console.log(personer)
-
+    section.textContent = "";
     personer.forEach(person => {
-                const klon = temp.cloneNode(true).content;
+        if (filter == person.troende || filter == "alle"){
+                const klon = temp.cloneNode(true)
                 klon.querySelector("h2").textContent = person.fornavn + person.efternavn;
                 klon.querySelector(".titel").textContent = "titel: " + person.titel;
                 klon.querySelector(".føselsdag").textContent = "føselsdag: " + person.føselsdag;
                 klon.querySelector(".billede").src ="faces/"+person.billede;
               
                 section.appendChild(klon);
-            })
-}   
+            }
+        
+        } )
+    }
 
 
 
