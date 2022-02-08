@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>persongalleri</title>
+
+    <style>
+img {
+
+width: 100%;
+
+}
+
+section {
+
+display: grid;
+
+grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+
+grid-gap: 5px;
+
+}
+
+article {
+
+border: 1px solid black;
+
+margin: 2%;
+
+padding: 2%;
+}
+
+nav {
+
+display: flex;
+
+justify-content: center;
+
+gap: 10px;
+
+}
+
+.valgt {
+
+background-color: brown;
+
+}
+
+#modal{
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    background-color: black;
+    display: none;
+    left: 0;
+    top: 0;
+}
+#modal article{
+    max-width: 900px;
+    margin: auto;
+    background-color: white;
+}
+#luk{
+position: fixed;
+padding: 1em;
+font-size: 1.7em;
+font-weight: bold;
+color: white;
+cursor: pointer;
+}
+
+    </style>
+
+</head>
+
+<body>
+    <h1>Alle</h1>
+    <nav>
+        <button data-troende="alle" class="valgt">Alle</button>
+        <button data-troende="ja">Troende</button>
+        <button data-troende="nej">Ikke Troende</button>
+        <button data-troende="tvivler">Tvivler</button>
+    </nav>
+    <aside id="modal">
+        <div id="luk">luk</div>
+        <article>
+            <h2></h2>
+            <img src="" alt="" class="billede">
+            <p></p>
+            <p></p>
+        </article>
+    </aside>
+    <section> </section>
+<template>
+    <article>
+    <img src="" alt="" class="billede">
+    <h2 class="navn"></h2>
+    <p class="titel"></p>
+    <p class="føselsdag"></p>
+    </article>
+</template>
+
+    <script>
+        const section = document.querySelector("section")
+        const temp = document.querySelector("template").content;
+        const header = document.querySelector("h1") 
+        const modal = document.querySelector("#modal") 
+        let personer; 
+        let filter = "alle";
+        
+        
+    const url ="https://persongalleri-5d3e.restdb.io/rest/persongalleri";
+
+    const options = {
+        headers: {
+            'x-apikey':"600fe9211346a1524ff12e31"
+        }
+    };
+
+    document.addEventListener("DOMContentLoaded", start);
+
+    function start() {
+
+    const filterKnapper = document.querySelectorAll("nav button");
+
+    filterKnapper.forEach((knap) =>
+
+    knap.addEventListener("click", filtrerPersoner)
+
+    );
+
+    hentdata();
+
+    }
+
+    function filtrerPersoner() {
+
+    filter = this.dataset.troende;
+    document.querySelector(".valgt").classList.remove("valgt");
+    this.classList.add("valgt")
+    vis();
+    header.textContent = this.textContent;
+    }
+
+    async function hentdata() {
+            const respons = await fetch(url,options);
+             personer = await respons.json();
+            vis();
+        }
+        
+
+
+    function vis(){
+    console.log(personer)
+    section.textContent = "";
+    personer.forEach(person => {
+        if (filter == person.troende || filter == "alle"){
+            
+                const klon = temp.cloneNode(true)
+
+                klon.querySelector("h2").textContent = person.fornavn + " " + person.efternavn;
+                klon.querySelector(".titel").textContent = "titel: " + person.titel;
+                klon.querySelector(".føselsdag").textContent = "føselsdag: " + person.føselsdag;
+                klon.querySelector(".billede").src ="faces/"+person.billede;
+                klon.querySelector("article").addEventListener("click", () => visDetaljer(person));
+                section.appendChild(klon);
+            }
+        
+        } )
+    }
+    function visDetaljer(person){
+    console.log(person)
+
+    modal.style.display = "block"
+    modal.querySelector("h2").textContent = person.fornavn + " " + person.efternavn;
+    modal.querySelector("p").textContent = "titel: " + person.titel;
+    modal.querySelector(".billede").src ="faces/"+person.billede;
+
+    }
+
+    modal.querySelector("#luk").addEventListener("click", () => (modal.style.display = "none"));
+    
+    </script>
+</body>
+</html>
